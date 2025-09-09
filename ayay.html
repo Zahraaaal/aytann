@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday</title>
+  <style>
+    /* Hintergrund mit rosa Aura */
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: radial-gradient(
+        circle at center,
+        rgba(255, 182, 193, 0.9) 0%, 
+        rgba(255, 105, 180, 0.6) 40%, 
+        rgba(255, 182, 193, 0.2) 80%
+      );
+      background-attachment: fixed;
+      overflow: hidden; /* Verhindert Scrollen durch fallende Elemente */
+      text-align: center;
+    }
+
+    h1 {
+      color: #e92282;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 5px black, 0 0 15px #cb5a91, 0 0 20px #ea3486;
+    }
+
+    h2 {
+      color: #ad2366;
+      font-size: 1.7rem;
+      text-shadow: 1px 1px 4px #232121;
+      margin-bottom: 25px;
+    }
+
+    /* Container für Buttons */
+    .button-container {
+      display: flex;
+      gap: 20px; /* Abstand zwischen Buttons */
+      margin-top: 10px;
+    }
+
+    button {
+      font-size: 1.2rem;
+      box-shadow: 0px 0px 12px rgb(182, 43, 145);
+      border-radius: 10px;
+      background-color: #1b1518;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.2s, box-shadow 0.3s;
+    }
+
+    /* Hover-Effekt */
+    button:hover {
+      background-color: #ff4fa3;
+      transform: scale(1.1);
+      box-shadow: 0 0 20px #ff8cd4, 0 0 30px #ffb0e6;
+    }
+
+    button:active {
+      background-color: rgb(24, 40, 58);
+      transform: translateY(2px);
+    }
+
+    #ausgabe {
+      margin-top: 20px;
+      font-size: 1.5rem;
+      color: #ad2366;
+      text-shadow: 1px 1px 3px rgb(94, 87, 87);
+    }
+
+    /* Layer für fallende Items */
+    #fall-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .fall-item {
+      position: absolute;
+      top: -10vh;
+      will-change: transform, opacity;
+      animation: fall linear forwards;
+      opacity: 0.95;
+    }
+    .fall-item img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
+    .fall-item span {
+      font-size: 44px;
+      line-height: 1;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translate3d(var(--x, 0), -10vh, 0) rotate(var(--rStart, 0deg));
+      }
+      100% {
+        transform: translate3d(calc(var(--x, 0) + var(--drift, 0px)), 110vh, 0)
+                   rotate(calc(var(--rStart, 0deg) + var(--rSpin, 360deg)));
+        opacity: 0.8;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1> HAPPY BIRTHDAY </h1>
+  <h2>Hast du schon vor der Tür geschaut?</h2>
+
+  <div class="button-container">
+    <button onclick="antwort('Ja')">Ja</button>
+    <button onclick="antwort('Nein')">Nein</button>
+  </div>
+
+  <div id="ausgabe"></div>
+
+  <!-- Layer für die fallenden Items -->
+  <div id="fall-layer"></div>
+
+  <script>
+    function antwort(antwort) {
+      const output = document.getElementById('ausgabe');
+      if (antwort === 'Ja') {
+        output.textContent = 'Yippie!!!';
+      } else {
+        output.textContent = 'Worauf wartest du?';
+      }
+    }
+
+    // Eigene Assets (Icons, Emojis, Bilder)
+    const FALL_ASSETS = [
+      { type: 'img', src: 'buch.png' },   // Bild aus img/ Ordner
+      { type: 'img', src: 'kaffee.png' },
+      { type: 'img', src: 'pic.png' },
+      { type: 'img', src: 'piic.png' },
+      { type: 'img', src: 'leave.webp' }
+     
+    ];
+
+    const COUNT = 35;          // Anzahl der fallenden Elemente
+    const DURATION_BASE = 7;   // Dauer in Sekunden
+
+    function spawnFallingItems() {
+      const layer = document.getElementById('fall-layer');
+
+      for (let i = 0; i < COUNT; i++) {
+        const asset = FALL_ASSETS[Math.floor(Math.random() * FALL_ASSETS.length)];
+        const el = document.createElement('div');
+        el.className = 'fall-item';
+
+        // Zufallswerte
+        const startXvw = Math.random() * 100;
+        const driftPx = (Math.random() * 160 - 80);
+        const rotStart = Math.floor(Math.random() * 360) + 'deg';
+        const rotSpin = (Math.random() > 0.5 ? 360 : -360) + 'deg';
+        const scale = 0.7 + Math.random() * 0.9;
+        const delay = Math.random() * 1.5;
+        const duration = DURATION_BASE + Math.random() * 3;
+
+        el.style.setProperty('--x', startXvw + 'vw');
+        el.style.setProperty('--drift', driftPx + 'px');
+        el.style.setProperty('--rStart', rotStart);
+        el.style.setProperty('--rSpin', rotSpin);
+        el.style.animationDuration = duration + 's';
+        el.style.animationDelay = delay + 's';
+        el.style.transform = `scale(${scale})`;
+
+        if (asset.type === 'img') {
+          const img = document.createElement('img');
+          img.src = asset.src;
+          img.alt = '';
+          el.appendChild(img);
+        } else {
+          const span = document.createElement('span');
+          span.textContent = asset.char;
+          el.appendChild(span);
+        }
+
+        layer.appendChild(el);
+
+        // Aufräumen nach der Animation
+        el.addEventListener('animationend', () => el.remove());
+      }
+    }
+
+    window.addEventListener('load', () => {
+      spawnFallingItems();
+    });
+  </script>
+</body>
+</html>
